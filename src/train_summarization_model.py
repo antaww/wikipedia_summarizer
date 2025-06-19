@@ -226,7 +226,7 @@ def test_model_inference(model, tokenizer, test_text, max_length=128):
     
     return summary
 
-def main():
+def train_summarization_model():
     """
     Fonction principale d'entraînement
     """
@@ -293,7 +293,7 @@ def main():
 
 if __name__ == "__main__":
     try:
-        main()
+        train_summarization_model()
     except KeyboardInterrupt:
         logger.info("\n\nEntraînement interrompu par l'utilisateur. Au revoir! 👋")
     except Exception as e:

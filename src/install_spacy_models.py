@@ -30,7 +30,7 @@ def install_spacy_model(model_name: str) -> bool:
         logger.error(f"❌ Exception lors de l'installation de {model_name}: {e}")
         return False
 
-def main():
+def install_spacy_models():
     """
     Installe les modèles spaCy pour français et anglais
     """
@@ -59,4 +59,4 @@ def main():
         print("Le résumeur fonctionnera sans lemmatisation pour ces langues.")
 
 if __name__ == "__main__":
-    main() 
+    install_spacy_models() 

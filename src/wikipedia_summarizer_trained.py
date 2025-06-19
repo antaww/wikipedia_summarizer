@@ -15,7 +15,7 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
-class WikipediaSummarizer:
+class WikipediaSummarizerTrained:
     """
     Classe pour résumer des articles Wikipedia avec le modèle entraîné
     """
@@ -37,7 +37,7 @@ class WikipediaSummarizer:
         
         if not os.path.exists(self.model_path):
             logger.error(f"Modèle non trouvé: {self.model_path}")
-            logger.info("Veuillez d'abord entraîner le modèle avec train_summarization_model.py")
+            logger.info("Veuillez d'abord entraîner le modèle avec le mode train")
             return False
         
         try:
@@ -184,7 +184,7 @@ def interactive_mode():
     """
     Mode interactif pour résumer des articles
     """
-    summarizer = WikipediaSummarizer()
+    summarizer = WikipediaSummarizerTrained()
     
     if summarizer.model is None:
         print("❌ Impossible de charger le modèle")
@@ -262,7 +262,7 @@ def demo_articles():
         "Révolution française"
     ]
     
-    summarizer = WikipediaSummarizer()
+    summarizer = WikipediaSummarizerTrained()
     
     if summarizer.model is None:
         print("❌ Impossible de charger le modèle")
@@ -293,34 +293,29 @@ def demo_articles():
         
         print("\n")
 
-def main():
-    """
-    Fonction principale
-    """
-    print("=== Résumeur Wikipedia avec Modèle Entraîné ===\n")
-    
-    choice = input("""
+if __name__ == "__main__":
+    try:
+        print("=== Résumeur Wikipedia avec Modèle Entraîné ===\n")
+        
+        choice = input("""
 Choisissez le mode:
 1. Mode interactif
 2. Démonstration avec articles prédéfinis
 3. Les deux
 
 Votre choix [1]: """).strip()
-    
-    if choice == "2":
-        demo_articles()
-    elif choice == "3":
-        demo_articles()
-        print("\n" + "="*80)
-        print("Passage en mode interactif...")
-        print("="*80 + "\n")
-        interactive_mode()
-    else:
-        interactive_mode()
-
-if __name__ == "__main__":
-    try:
-        main()
+        
+        if choice == "2":
+            demo_articles()
+        elif choice == "3":
+            demo_articles()
+            print("\n" + "="*80)
+            print("Passage en mode interactif...")
+            print("="*80 + "\n")
+            interactive_mode()
+        else:
+            interactive_mode()
+            
     except KeyboardInterrupt:
         print("\n\nInterruption utilisateur. Au revoir! 👋")
     except Exception as e:

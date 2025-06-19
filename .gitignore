@@ -3,3 +3,4 @@
 .venv
 TP Pipeline NLP.ipynb
 src/__pycache__
+models/

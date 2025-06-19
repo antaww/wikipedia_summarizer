@@ -12,16 +12,13 @@ from nltk.tokenize import word_tokenize, sent_tokenize
 import re
 import string
 
-# Ajouter le dossier src au path
-sys.path.append(str(Path(__file__).parent / "src"))
-
-from config import Config
-from text_preprocessor import TextPreprocessor
-
 # Configuration du logging
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
+# Import depuis le même dossier
+from .config import Config
+from .text_preprocessor import TextPreprocessor
 
 def print_section(title: str, content: str, max_chars: int = 500):
     """Affiche une section avec un titre et du contenu limité"""
@@ -180,8 +177,8 @@ def demonstrate_full_pipeline(text: str, language: str = "fr"):
             print(f"📈 {feature}: {value}")
 
 
-def main():
-    """Fonction principale"""
+def visualize_preprocessing(article_title: str = None, language: str = "fr"):
+    """Fonction principale de visualisation"""
     print("🎯 VISUALISATION DE LA PIPELINE DE PREPROCESSING")
     print("=" * 80)
     
@@ -189,18 +186,19 @@ def main():
     default_article = "Intelligence artificielle"
     default_language = "fr"
     
-    # Demander à l'utilisateur de choisir un article
-    print(f"\nArticle par défaut: '{default_article}' (langue: {default_language})")
-    choice = input("📝 Appuyez sur Entrée pour continuer ou tapez un autre titre d'article: ").strip()
-    
-    if choice:
-        article_title = choice
-    else:
-        article_title = default_article
-    
-    # Choix de la langue
-    lang_choice = input("🌍 Langue (fr/en) [fr]: ").strip().lower()
-    language = lang_choice if lang_choice in ['fr', 'en'] else default_language
+    if not article_title:
+        # Demander à l'utilisateur de choisir un article
+        print(f"\nArticle par défaut: '{default_article}' (langue: {default_language})")
+        choice = input("📝 Appuyez sur Entrée pour continuer ou tapez un autre titre d'article: ").strip()
+        
+        if choice:
+            article_title = choice
+        else:
+            article_title = default_article
+        
+        # Choix de la langue
+        lang_choice = input("🌍 Langue (fr/en) [fr]: ").strip().lower()
+        language = lang_choice if lang_choice in ['fr', 'en'] else default_language
     
     try:
         # Récupération de l'article
@@ -228,8 +226,8 @@ def main():
         
     except Exception as e:
         logger.error(f"❌ Erreur: {e}")
-        sys.exit(1)
+        raise
 
 
 if __name__ == "__main__":
-    main() 
+    visualize_preprocessing() 
