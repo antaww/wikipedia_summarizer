@@ -1,0 +1,20 @@
+Ce qui se passe ACTUELLEMENT lors de la construction du dataset :
+✅ Récupération article Wikipedia brut
+✅ Preprocessing COMPLET via preprocess_for_summarization() qui fait :
+- Nettoyage (références [1], balises {{}}, URLs, téléphones, argent)
+- Tokenisation (phrases + mots)
+- Suppression stopwords (mais garde mots de liaison importants)
+- Lemmatisation (TextBlob + NLTK)
+✅ Extraction features (caps_ratio, lexical_diversity, etc.)
+✅ Scoring des phrases pour le résumé
+✅ Sauvegarde en CSV avec :
+- original_content (texte brut)
+- processed_content (texte après tout le pipeline)
+- Toutes les features calculées
+- Scores de phrases en JSON
+
+Donc dans le CSV final, on aura :
+- Texte original ET texte preprocessé
+- Toutes les features numériques extraites
+- Métadonnées complètes
+- Scores de qualité de chaque phrase
