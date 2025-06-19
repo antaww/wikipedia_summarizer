@@ -1,0 +1,5 @@
+.env
+.idea
+.venv
+TP Pipeline NLP.ipynb
+src/__pycache__

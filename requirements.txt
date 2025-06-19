@@ -1,0 +1,11 @@
+nltk
+spacy
+scikit-learn
+pandas
+numpy
+matplotlib
+seaborn
+textblob
+wordcloud
+Wikipedia-API==0.8.1
+requests
