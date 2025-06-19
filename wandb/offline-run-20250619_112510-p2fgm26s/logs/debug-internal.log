@@ -1,0 +1,15 @@
+{"time":"2025-06-19T11:25:11.9059501+02:00","level":"INFO","msg":"stream: starting","core version":"0.20.1","symlink path":"C:\\Users\\antap\\PycharmProjects\\NLP\\wandb\\offline-run-20250619_112510-p2fgm26s\\logs\\debug-core.log"}
+{"time":"2025-06-19T11:25:12.7534416+02:00","level":"WARN","msg":"GraphQL client is nil, skipping feature loading"}
+{"time":"2025-06-19T11:25:12.75497+02:00","level":"INFO","msg":"stream: created new stream","id":"p2fgm26s"}
+{"time":"2025-06-19T11:25:12.75497+02:00","level":"INFO","msg":"stream: started","id":"p2fgm26s"}
+{"time":"2025-06-19T11:25:12.75497+02:00","level":"INFO","msg":"handler: started","stream_id":"p2fgm26s"}
+{"time":"2025-06-19T11:25:12.7555608+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"p2fgm26s"}
+{"time":"2025-06-19T11:25:12.7555608+02:00","level":"INFO","msg":"sender: started","stream_id":"p2fgm26s"}
+{"time":"2025-06-19T11:25:12.7701445+02:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-06-19T11:38:09.307154+02:00","level":"INFO","msg":"stream: closing","id":"p2fgm26s"}
+{"time":"2025-06-19T11:38:09.3088038+02:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-06-19T11:38:09.3088038+02:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-06-19T11:38:09.3134552+02:00","level":"INFO","msg":"sender: closed","stream_id":"p2fgm26s"}
+{"time":"2025-06-19T11:38:09.3139706+02:00","level":"INFO","msg":"handler: closed","stream_id":"p2fgm26s"}
+{"time":"2025-06-19T11:38:09.3139706+02:00","level":"INFO","msg":"writer: Close: closed","stream_id":"p2fgm26s"}
+{"time":"2025-06-19T11:38:09.314486+02:00","level":"INFO","msg":"stream: closed","id":"p2fgm26s"}
