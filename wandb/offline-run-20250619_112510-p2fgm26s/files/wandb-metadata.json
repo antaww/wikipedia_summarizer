@@ -1,0 +1,42 @@
+{
+  "os":  "Windows-10-10.0.19041-SP0",
+  "python":  "CPython 3.12.7",
+  "startedAt":  "2025-06-19T09:25:11.612042Z",
+  "program":  "C:\\Users\\antap\\PycharmProjects\\NLP\\train_summarization_model.py",
+  "codePath":  "train_summarization_model.py",
+  "git":  {
+    "remote":  "https://github.com/antaww/wikipedia_summarizer.git",
+    "commit":  "e12e1190800154f32cdcc1282ac61b9dedcb7b1b"
+  },
+  "root":  "C:\\Users\\antap\\PycharmProjects\\NLP",
+  "host":  "MSI",
+  "executable":  "C:\\Users\\antap\\PycharmProjects\\NLP\\.venv\\Scripts\\python.exe",
+  "codePathLocal":  "train_summarization_model.py",
+  "cpu_count":  8,
+  "cpu_count_logical":  16,
+  "gpu":  "NVIDIA GeForce RTX 2080 Super with Max-Q Design",
+  "gpu_count":  1,
+  "disk":  {
+    "/":  {
+      "total":  "999411412992",
+      "used":  "781893332992"
+    }
+  },
+  "memory":  {
+    "total":  "16984260608"
+  },
+  "cpu":  {
+    "count":  8,
+    "countLogical":  16
+  },
+  "gpu_nvidia":  [
+    {
+      "name":  "NVIDIA GeForce RTX 2080 Super with Max-Q Design",
+      "memoryTotal":  "8589934592",
+      "cudaCores":  3072,
+      "architecture":  "Turing",
+      "uuid":  "GPU-ab27f185-d335-81ed-9c2b-8c8df0de2a4b"
+    }
+  ],
+  "cudaVersion":  "12.3"
+}
