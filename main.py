@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Résumeur d'articles Wikipédia utilisant des techniques NLP
-Pipeline complet : preprocessing → dataset → entraînement → résumé avec modèle entraîné
+🤖 Pipeline NLP Complet - Auto-encodeur + Clustering + Résumé Automatique
+Architecture : TF-IDF → Auto-encodeur (32D) → K-means → Analyse intelligente
 
 Modes disponibles:
 - build_dataset: Construction du dataset d'entraînement
-- train: Entraînement du modèle Transformer
-- summarize: Résumé avec le modèle entraîné (différent du résumé Wikipedia pour dataset)
+- train: Entraînement auto-encodeur + clustering (TensorFlow)
+- summarize: Analyse et résumé d'un article avec le pipeline entraîné
 - interactive: Mode interactif de résumé
 - demo: Démonstration avec articles prédéfinis
 - visualize: Visualisation du preprocessing
@@ -48,75 +48,214 @@ def build_dataset_mode(args):
 
 
 def train_mode(args):
-    """Mode entraînement du modèle"""
-    logger.info("Entraînement du modèle de résumé Transformer")
+    """Mode entraînement auto-encodeur + clustering (TensorFlow)"""
+    logger.info("Entraînement du pipeline Auto-encodeur + Clustering")
     
-    from src.train_summarization_model import train_summarization_model
-    train_summarization_model()
-    logger.info("Entraînement terminé")
+    try:
+        from src.autoencoder_clustering import run_autoencoder_clustering_pipeline
+        
+        # Configuration selon les arguments
+        config = {
+            'max_features': args.max_features,
+            'encoding_dim': args.encoding_dim,
+            'n_clusters': args.n_clusters,
+            'epochs': args.epochs,
+            'batch_size': getattr(args, 'batch_size', 32),
+            'random_state': 42,
+            'models_dir': 'models'
+        }
+        
+        print(f"\n{'='*80}")
+        print("🧠 ENTRAÎNEMENT AUTO-ENCODEUR + CLUSTERING")
+        print(f"{'='*80}")
+        print(f"🔤 Features TF-IDF max: {config['max_features']}")
+        print(f"🧠 Dimensions encodage: {config['encoding_dim']}")
+        print(f"🎯 Nombre de clusters: {config['n_clusters']}")
+        print(f"⏰ Époques: {config['epochs']}")
+        print(f"📦 Batch size: {config['batch_size']}")
+        print(f"{'='*80}")
+        
+        # Vérification du dataset
+        dataset_path = "data/wikipedia_dataset_fr.csv"
+        if not Path(dataset_path).exists():
+            logger.error(f"❌ Dataset non trouvé: {dataset_path}")
+            logger.info("💡 Construisez d'abord le dataset avec: python main.py --mode build_dataset")
+            return
+        
+        # Suppression des anciens modèles si ils existent
+        old_models = [
+            'models/autoencoder.h5',
+            'models/encoder.h5'
+        ]
+        
+        for model_path in old_models:
+            if Path(model_path).exists():
+                Path(model_path).unlink()
+                logger.info(f"🗑️  Suppression ancien modèle: {model_path}")
+        
+        # Lancement de l'entraînement
+        logger.info("🚀 Démarrage de l'entraînement...")
+        
+        results = run_autoencoder_clustering_pipeline(
+            dataset_path,
+            max_features=config['max_features'],
+            encoding_dim=config['encoding_dim'],
+            n_clusters=config['n_clusters'],
+            epochs=config['epochs'],
+            batch_size=config['batch_size']
+        )
+        
+        # Affichage des résultats
+        print(f"\n{'='*80}")
+        print("🎉 ENTRAÎNEMENT TERMINÉ AVEC SUCCÈS!")
+        print(f"{'='*80}")
+        
+        # Métriques
+        metrics = results['clustering_metrics']
+        print(f"📊 Silhouette Score: {metrics['silhouette_score']:.3f}")
+        print(f"📊 Inertie: {metrics['inertia']:.1f}")
+        
+        # Fichiers générés
+        print(f"\n💾 Modèles sauvegardés:")
+        print(f"   - models/autoencoder.weights.h5")
+        print(f"   - models/encoder.weights.h5")
+        print(f"   - models/autoencoder_config.pkl")
+        print(f"   - models/encoder_config.pkl")
+        print(f"   - models/tfidf_vectorizer.pkl")
+        print(f"   - models/kmeans_model.pkl")
+        print(f"   - models/pipeline_results.pkl")
+        
+        # Prochaines étapes
+        print(f"\n💡 Prochaines étapes:")
+        print(f"   - Tester: python main.py --mode analyze --article \"Titre Article\"")
+        print(f"   - Analyser: python analyze_keywords_and_summarize.py \"Titre\"")
+        
+        logger.info("Entraînement auto-encodeur terminé")
+        
+    except Exception as e:
+        logger.error(f"Erreur lors de l'entraînement: {e}")
+        raise
 
 
 def summarize_mode(args):
-    """Mode résumé avec le modèle entraîné"""
+    """Mode analyse et résumé avec le pipeline auto-encodeur"""
     if not args.article:
         logger.error("Veuillez spécifier un article avec --article")
         return
     
-    logger.info(f"Résumé de l'article avec le modèle entraîné: {args.article}")
-    
-    from src.wikipedia_summarizer_trained import WikipediaSummarizerTrained
-    
-    # Initialisation du résumeur avec modèle entraîné
-    summarizer = WikipediaSummarizerTrained()
-    
-    if summarizer.model is None:
-        logger.error("Modèle entraîné non trouvé. Veuillez d'abord entraîner le modèle avec --mode train")
-        return
+    logger.info(f"Analyse et résumé de l'article: {args.article}")
     
     try:
-        # Génération du résumé avec le modèle entraîné
-        result = summarizer.summarize_article(
-            args.article, 
-            language=args.lang,
-            max_length=args.max_length,
-            min_length=args.min_length
-        )
+        import sys
+        import os
         
-        if result:
-            print(f"\n{'='*80}")
-            print(f"📰 RÉSUMÉ GÉNÉRÉ PAR LE MODÈLE ENTRAÎNÉ")
-            print(f"{'='*80}")
-            print(f"🔗 Article: {result['title']}")
-            print(f"🌐 URL: {result['url']}")
-            print(f"📏 Longueur originale: {result['original_length']:,} caractères")
-            print(f"📏 Longueur résumé: {result['summary_length']:,} caractères")
-            print(f"📉 Taux de compression: {result['compression_ratio']:.1%}")
-            print(f"\n📋 Résumé généré:")
-            print("-" * 60)
-            print(result['summary'])
-            print("-" * 60)
-            print(f"{'='*80}")
-        else:
-            print("❌ Impossible de générer le résumé")
-            
+        # Exécution du script d'analyse
+        print(f"\n{'='*80}")
+        print("🔍 ANALYSE ET RÉSUMÉ AUTOMATIQUE")
+        print(f"{'='*80}")
+        
+        # Import du module d'analyse
+        current_dir = os.getcwd()
+        if current_dir not in sys.path:
+            sys.path.append(current_dir)
+        
+        from analyze_keywords_and_summarize import analyze_article_keywords
+        
+        # Lancement de l'analyse
+        analyze_article_keywords(args.article)
+        
+        print(f"\n{'='*80}")
+        print("✅ ANALYSE TERMINÉE!")
+        print(f"{'='*80}")
+        
     except Exception as e:
-        logger.error(f"Erreur lors du résumé: {e}")
+        logger.error(f"Erreur lors de l'analyse: {e}")
+        print("💡 Assurez-vous que les modèles sont entraînés avec --mode train")
+        raise
 
 
 def interactive_mode(args):
-    """Mode interactif"""
+    """Mode interactif de résumé"""
     logger.info("Lancement du mode interactif")
     
-    from src.wikipedia_summarizer_trained import interactive_mode
-    interactive_mode()
+    print("\n🎮 MODE INTERACTIF - RÉSUMÉ D'ARTICLES")
+    print("="*60)
+    
+    try:
+        from analyze_keywords_and_summarize import analyze_article_keywords
+        
+        while True:
+            print("\n💬 Entrez le titre d'un article Wikipedia à analyser:")
+            print("   (ou 'quit' pour quitter)")
+            
+            article_title = input("👉 Titre: ").strip()
+            
+            if article_title.lower() in ['quit', 'q', 'exit']:
+                print("👋 Au revoir!")
+                break
+            
+            if not article_title:
+                print("❌ Titre vide, veuillez réessayer")
+                continue
+            
+            try:
+                print(f"\n🔍 Analyse de '{article_title}'...")
+                analyze_article_keywords(article_title)
+                print("\n" + "="*60)
+                
+            except KeyboardInterrupt:
+                print("\n⏸️  Analyse interrompue")
+                break
+            except Exception as e:
+                print(f"❌ Erreur: {e}")
+                print("💡 Essayez un autre article")
+        
+    except Exception as e:
+        logger.error(f"Erreur mode interactif: {e}")
 
 
 def demo_mode(args):
-    """Mode démonstration"""
+    """Mode démonstration avec articles prédéfinis"""
     logger.info("Lancement de la démonstration")
     
-    from src.wikipedia_summarizer_trained import demo_articles
-    demo_articles()
+    # Articles d'exemple
+    demo_articles = [
+        "Intelligence artificielle",
+        "Python (langage)", 
+        "Chimie",
+        "Informatique",
+        "Machine learning"
+    ]
+    
+    print("\n🎪 DÉMONSTRATION - RÉSUMÉ D'ARTICLES")
+    print("="*60)
+    print(f"📚 {len(demo_articles)} articles d'exemple")
+    
+    try:
+        from analyze_keywords_and_summarize import analyze_article_keywords
+        
+        for i, article in enumerate(demo_articles, 1):
+            print(f"\n{'='*80}")
+            print(f"📖 ARTICLE {i}/{len(demo_articles)}: {article}")
+            print(f"{'='*80}")
+            
+            try:
+                analyze_article_keywords(article)
+                
+                if i < len(demo_articles):
+                    input("\n⏸️  Appuyez sur Entrée pour continuer...")
+                    
+            except KeyboardInterrupt:
+                print("\n⏹️  Démonstration interrompue")
+                break
+            except Exception as e:
+                print(f"❌ Erreur pour '{article}': {e}")
+                continue
+        
+        print(f"\n🎉 Démonstration terminée!")
+        
+    except Exception as e:
+        logger.error(f"Erreur démonstration: {e}")
 
 
 def visualize_mode(args):
@@ -136,24 +275,78 @@ def install_spacy_mode(args):
 
 
 def evaluate_mode(args):
-    """Mode évaluation du modèle"""
-    logger.info("Évaluation du modèle")
+    """Mode évaluation du pipeline"""
+    logger.info("Évaluation du pipeline auto-encodeur")
     
-    from src.wikipedia_summarizer_trained import WikipediaSummarizerTrained
-    
-    summarizer = WikipediaSummarizerTrained()
-    
-    if summarizer.model is None:
-        logger.error("Modèle entraîné non trouvé. Veuillez d'abord entraîner le modèle.")
-        return
-    
-    print(f"\n{'='*60}")
-    print("📊 ÉVALUATION DU MODÈLE")
-    print(f"{'='*60}")
-    print("✅ Modèle chargé avec succès")
-    print(f"🖥️  Device: {summarizer.device}")
-    print(f"📁 Chemin du modèle: {summarizer.model_path}")
-    print(f"{'='*60}")
+    try:
+        import pickle
+        import numpy as np
+        from pathlib import Path
+        
+        print(f"\n{'='*60}")
+        print("📊 ÉVALUATION DU PIPELINE")
+        print(f"{'='*60}")
+        
+        # Vérification des modèles
+        model_files = [
+            'models/autoencoder.weights.h5',
+            'models/encoder.weights.h5',
+            'models/tfidf_vectorizer.pkl',
+            'models/kmeans_model.pkl',
+            'models/pipeline_results.pkl'
+        ]
+        
+        missing_files = [f for f in model_files if not Path(f).exists()]
+        
+        if missing_files:
+            print("❌ Modèles manquants:")
+            for f in missing_files:
+                print(f"   - {f}")
+            print("💡 Exécutez: python main.py --mode train")
+            return
+        
+        # Chargement des résultats
+        with open('models/pipeline_results.pkl', 'rb') as f:
+            results = pickle.load(f)
+        
+        print("✅ Tous les modèles sont présents")
+        
+        # Métriques
+        metrics = results['clustering_metrics']
+        tfidf_shape = results['tfidf_matrix'].shape
+        encoded_shape = results['encoded_vectors'].shape
+        
+        print(f"\n📊 MÉTRIQUES DU PIPELINE:")
+        print(f"   - Silhouette Score: {metrics['silhouette_score']:.3f}")
+        print(f"   - Inertie K-means: {metrics['inertia']:.1f}")
+        print(f"   - Documents traités: {tfidf_shape[0]}")
+        print(f"   - Compression: {tfidf_shape[1]} → {encoded_shape[1]} dims")
+        print(f"   - Taux de compression: {(encoded_shape[1]/tfidf_shape[1])*100:.1f}%")
+        
+        # Distribution des clusters
+        cluster_labels = results['cluster_labels']
+        unique, counts = np.unique(cluster_labels, return_counts=True)
+        
+        print(f"\n🎯 DISTRIBUTION DES CLUSTERS:")
+        total = len(cluster_labels)
+        for cluster_id, count in zip(unique, counts):
+            percentage = (count / total) * 100
+            print(f"   - Cluster {cluster_id}: {count} docs ({percentage:.1f}%)")
+        
+        print(f"\n💾 Taille des modèles:")
+        for model_file in model_files:
+            if Path(model_file).exists():
+                size_kb = Path(model_file).stat().st_size / 1024
+                print(f"   - {model_file}: {size_kb:.1f} KB")
+        
+        print(f"{'='*60}")
+        
+    except Exception as e:
+        logger.error(f"Erreur évaluation: {e}")
+        print("💡 Assurez-vous que les modèles sont entraînés")
+
+
+
 
 
 def main():
@@ -167,22 +360,25 @@ Exemples d'utilisation:
   python main.py --mode install_spacy
   
   # 2. Construire un dataset
-  python main.py --mode build_dataset --num_articles 100 --lang fr
+  python main.py --mode build_dataset --num_articles 50 --lang fr
   
-  # 3. Entraîner le modèle
-  python main.py --mode train
+  # 3. Entraîner le pipeline auto-encodeur + clustering
+  python main.py --mode train --encoding_dim 32 --n_clusters 5 --epochs 100
   
-  # 4. Résumer un article avec le modèle entraîné
-  python main.py --mode summarize --article "Intelligence artificielle" --lang fr
+  # 4. Analyser et résumer un article
+  python main.py --mode summarize --article "Chimie"
   
   # 5. Mode interactif
   python main.py --mode interactive
   
-  # 6. Démonstration
+  # 6. Démonstration avec articles prédéfinis
   python main.py --mode demo
   
   # 7. Visualiser le preprocessing
   python main.py --mode visualize --article "Python (langage)"
+  
+  # 8. Évaluer les métriques du pipeline
+  python main.py --mode evaluate
         """
     )
     
@@ -230,6 +426,35 @@ Exemples d'utilisation:
         help="Longueur minimale du résumé généré"
     )
     
+    # Nouveaux paramètres pour le mode autoencoder_clustering
+    parser.add_argument(
+        "--max_features",
+        type=int,
+        default=5000,
+        help="Nombre maximum de features TF-IDF (mode train)"
+    )
+    
+    parser.add_argument(
+        "--encoding_dim",
+        type=int,
+        default=32,
+        help="Dimensions de la couche d'encodage de l'auto-encodeur (mode train)"
+    )
+    
+    parser.add_argument(
+        "--n_clusters",
+        type=int,
+        default=5,
+        help="Nombre de clusters pour K-means (mode train)"
+    )
+    
+    parser.add_argument(
+        "--epochs",
+        type=int,
+        default=100,
+        help="Nombre d'époques d'entraînement (mode train)"
+    )
+    
     args = parser.parse_args()
     
     print("=" * 80)
@@ -266,6 +491,8 @@ Exemples d'utilisation:
             
         elif args.mode == "evaluate":
             evaluate_mode(args)
+            
+
             
     except KeyboardInterrupt:
         print("\n\n⏹️  Interruption utilisateur. Au revoir! 👋")
